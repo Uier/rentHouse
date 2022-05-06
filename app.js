@@ -11,10 +11,8 @@ let countFail = 0;
   let originPostId = await getFirstPostId();
   stopIntervalId = setInterval(async () => {
     console.log(`${new Date()}: '我還活著'`);
-    const headerInfo = await getToken(process.env.TARGET_URL);
+    const { csrfToken, cookie } = await getToken(process.env.TARGET_URL);
     const houseListURL = `https://rent.591.com.tw/home/search/rsList?${process.env.TARGET_URL.split('?')[1]}`;
-    const csrfToken = headerInfo[0];
-    const cookie = headerInfo[1];
     try {
       const resp = await getRequest({
         url: houseListURL,

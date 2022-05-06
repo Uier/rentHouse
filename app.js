@@ -29,7 +29,12 @@ let countFail = 0;
       const { data } = resp.body.data;
       const targetData = (data[0].post_id !== originPostId) ? data[0].post_id : originPostId;
       if (targetData === originPostId) return;
-      await sendLineNotify(`\nhttps://rent.591.com.tw/rent-detail-${targetData}.html`, process.env.LINE_NOTIFY_TOKEN);
+      const webUrl = `https://rent.591.com.tw/rent-detail-${targetData}.html`;
+      const mobileUrl = `https://house591.page.link/?link=https://m.591.com.tw/v2/rent/${targetData}&apn=com.addcn.android.house591&amv=147&afl=https://www.591.com.tw/home/tools/app/android?id=com.addcn.android.house591&ifl=https://www.591.com.tw/home/tools/app/ios&isi=448156496&ibi=com.Addcn.house591&ipbi=com.Addcn.house591&efr=1`
+      const messageContent = process.env.WITH_MOBILE_APP_URL === 'true'
+        ? `\n${webUrl}\n\n${mobileUrl}`
+        : `\n${webUrl}`;
+      await sendLineNotify(messageContent, process.env.LINE_NOTIFY_TOKEN);
       originPostId = targetData;
     } catch (error) {
       if (countFail > 10) {

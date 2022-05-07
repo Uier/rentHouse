@@ -7,10 +7,16 @@ const getToken = require('./lib/getToken');
 
 let stopIntervalId;
 let countFail = 0;
+let lastNotiForConfirm = new Date();
 (async () => {
   let originPostId = await getFirstPostId();
   stopIntervalId = setInterval(async () => {
-    console.log(`${new Date()}: '我還活著'`);
+    const now = new Date();
+    if ( (now - lastNotiForConfirm) / (1000*60*60*24) > 1 ) {
+      lastNotiForConfirm = now;
+      sendLineNotify('我還活著', process.env.LINE_NOTIFY_TOKEN);
+    }
+    console.log(`${now}: '我還活著'`);
     const { csrfToken, cookie } = await getToken(process.env.TARGET_URL);
     const houseListURL = `https://rent.591.com.tw/home/search/rsList?${process.env.TARGET_URL.split('?')[1]}`;
     try {

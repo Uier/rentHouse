@@ -11,15 +11,15 @@ let lastNotiForConfirm = new Date();
 (async () => {
   let originPostId = await getFirstPostId();
   stopIntervalId = setInterval(async () => {
-    const now = new Date();
-    if ( (now - lastNotiForConfirm) / (1000*60*60*24) > 1 ) {
-      lastNotiForConfirm = now;
-      sendLineNotify('我還活著', process.env.LINE_NOTIFY_TOKEN);
-    }
-    console.log(`${now}: '我還活著'`);
-    const { csrfToken, cookie } = await getToken(process.env.TARGET_URL);
-    const houseListURL = `https://rent.591.com.tw/home/search/rsList?${process.env.TARGET_URL.split('?')[1]}`;
     try {
+      const now = new Date();
+      if ( (now - lastNotiForConfirm) / (1000*60*60*24) > 1 ) {
+        lastNotiForConfirm = now;
+        sendLineNotify('我還活著', process.env.LINE_NOTIFY_TOKEN);
+      }
+      console.log(`${now}: '我還活著'`);
+      const { csrfToken, cookie } = await getToken(process.env.TARGET_URL);
+      const houseListURL = `https://rent.591.com.tw/home/search/rsList?${process.env.TARGET_URL.split('?')[1]}`;
       const resp = await getRequest({
         url: houseListURL,
         headers: {
@@ -46,6 +46,8 @@ let lastNotiForConfirm = new Date();
       if (countFail > 10) {
         await sendLineNotify(`\n好像出事了! 但是我嘗試重新拿 Token 第 ${countFail} 次了所以暫時先把程式關閉，有空可以檢查一下。\n `, process.env.LINE_NOTIFY_TOKEN);
         clearInterval(stopIntervalId);
+      } else if (countFail >= 3) {
+        await sendLineNotify(`\n噴了三次 error，有空檢查一下`, process.env.LINE_NOTIFY_TOKEN);
       }
       console.error(`Fetch the 591 rent fail: ${error}`);
       countFail += 1;
